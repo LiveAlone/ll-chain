@@ -1,0 +1,19 @@
+id: code-review
+description: "代码审查流程 —— 分析代码质量与安全性，生成综合报告"
+
+nodes:
+  - id: analyze
+    prompt: "分析代码质量，重点关注复杂度、命名规范、重复代码和可维护性。输出结构化的分析报告，包含具体的问题位置和改进建议。"
+    context:
+      files:
+        - "src/**/*.py"
+
+  - id: security
+    prompt: "进行安全审查，检查 OWASP Top 10 常见漏洞，包括注入攻击、认证缺陷、敏感数据泄露、XSS 等。输出安全发现列表，按严重程度排序。"
+    context:
+      files:
+        - "src/**/*.py"
+
+  - id: report
+    prompt: "综合代码质量分析和安全审查的结果，生成最终审查报告。报告应包含：总体评价、关键发现摘要、优先修复建议和改进路线图。"
+    depends_on: [analyze, security]
