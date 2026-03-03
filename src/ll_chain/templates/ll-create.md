@@ -38,10 +38,12 @@ ll-chain create {name} --flow {flow} --instruction "$ARGUMENTS"
 - 使用的 flow
 - 用户的 instruction
 
-提示用户执行 `/ll-run {name}` 开始流水线。
+提示用户：
+- 执行 `/ll-run {name}` 逐轮执行流水线
+- 执行 `/ll-ff {name}` 快速执行整条流水线
 
 ## 硬约束
 
 - **只使用** `ll-chain flows` 和 `ll-chain create` 命令
-- **不执行** `/ll-run`，只提示用户
+- **不执行** `/ll-run` 或 `/ll-ff`，只提示用户
 - **不修改** 任何项目代码文件或 schema 文件
