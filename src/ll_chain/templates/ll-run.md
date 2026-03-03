@@ -33,8 +33,6 @@
 
 #### 2a. QUERY — 获取任务详情
 
-执行 `ll-chain update {task_name} {node} running` 将状态设为 running。
-
 执行 `ll-chain stage {task_name} {node}` 获取完整任务信息，包括：
 - `instruction.prompts` — 任务指令列表，每项包含：
   - `source`: `"schema"`（流程定义的指令）或 `"user"`（用户补充说明）

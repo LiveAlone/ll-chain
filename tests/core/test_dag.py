@@ -70,9 +70,10 @@ class TestComputeReadyStages:
         ]
         stages = {
             "a": StageState(status="completed"),
-            "b": StageState(status="running"),
+            "b": StageState(status="failed"),
             "c": StageState(status="pending"),
         }
+        # b is failed so c's deps are not met; b itself is not pending so not ready
         assert compute_ready_stages(nodes, stages) == []
 
     def test_deps_all_completed(self):
@@ -88,12 +89,12 @@ class TestComputeReadyStages:
         }
         assert compute_ready_stages(nodes, stages) == ["c"]
 
-    def test_completed_or_running_not_ready(self):
+    def test_completed_or_failed_not_ready(self):
         nodes = [Node(id="a", prompt="")]
         stages = {"a": StageState(status="completed")}
         assert compute_ready_stages(nodes, stages) == []
 
-        stages = {"a": StageState(status="running")}
+        stages = {"a": StageState(status="failed")}
         assert compute_ready_stages(nodes, stages) == []
 
     def test_dep_has_failed(self):
@@ -121,13 +122,6 @@ class TestDeriveTaskStatus:
         }
         assert derive_task_status(stages) == "pending"
 
-    def test_has_running(self):
-        stages = {
-            "a": StageState(status="completed"),
-            "b": StageState(status="running"),
-        }
-        assert derive_task_status(stages) == "running"
-
     def test_has_failed(self):
         stages = {
             "a": StageState(status="completed"),
@@ -142,9 +136,23 @@ class TestDeriveTaskStatus:
         }
         assert derive_task_status(stages) == "completed"
 
-    def test_failed_takes_precedence_over_running(self):
+    def test_mixed_pending_completed(self):
         stages = {
-            "a": StageState(status="running"),
+            "a": StageState(status="completed"),
+            "b": StageState(status="pending"),
+        }
+        assert derive_task_status(stages) == "pending"
+
+    def test_failed_reset_to_pending(self):
+        stages = {
+            "a": StageState(status="completed"),
+            "b": StageState(status="pending"),  # was failed, reset to pending
+        }
+        assert derive_task_status(stages) == "pending"
+
+    def test_failed_takes_precedence_over_pending(self):
+        stages = {
+            "a": StageState(status="pending"),
             "b": StageState(status="failed"),
         }
         assert derive_task_status(stages) == "failed"

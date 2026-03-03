@@ -2,6 +2,7 @@ import click
 
 from ll_chain.constants import LLCHAIN_DIR
 from ll_chain.core.dag import compute_ready_stages
+from ll_chain.core.schema_resolver import resolve_schema_path
 from ll_chain.models.schema import Schema
 from ll_chain.models.task import Task
 from ll_chain.utils.output import output_result
@@ -20,7 +21,7 @@ def status_cmd(task_name: str, as_json: bool):
         raise click.ClickException(f"Task 不存在：{task_name}")
 
     task = Task.load(task_file)
-    schema = Schema.load(LLCHAIN_DIR / "schemas" / f"{task.flow}.yaml")
+    schema = Schema.load(resolve_schema_path(task.flow))
     ready = compute_ready_stages(schema.nodes, task.stages)
 
     result = {
@@ -28,9 +29,11 @@ def status_cmd(task_name: str, as_json: bool):
         "flow": task.flow,
         "status": task.status,
         "ready_stages": ready,
-        "running_stages": [s for s, st in task.stages.items() if st.status == "running"],
         "completed_stages": [s for s, st in task.stages.items() if st.status == "completed"],
         "failed_stages": [s for s, st in task.stages.items() if st.status == "failed"],
     }
+
+    if task.instruction is not None:
+        result["instruction"] = task.instruction
 
     output_result(result, as_json)

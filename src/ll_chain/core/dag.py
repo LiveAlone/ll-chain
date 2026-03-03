@@ -59,8 +59,6 @@ def derive_task_status(stages: dict[str, StageState]) -> str:
     statuses = [s.status for s in stages.values()]
     if any(s == "failed" for s in statuses):
         return "failed"
-    if any(s == "running" for s in statuses):
-        return "running"
     if all(s == "completed" for s in statuses):
         return "completed"
     return "pending"

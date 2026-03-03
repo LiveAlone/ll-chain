@@ -10,13 +10,10 @@ import yaml
 @dataclass
 class StageState:
     status: str = "pending"
-    started_at: str | None = None
     completed_at: str | None = None
 
     def to_dict(self) -> dict:
         d: dict = {"status": self.status}
-        if self.started_at is not None:
-            d["started_at"] = self.started_at
         if self.completed_at is not None:
             d["completed_at"] = self.completed_at
         return d
@@ -25,7 +22,6 @@ class StageState:
     def from_dict(cls, data: dict) -> StageState:
         return cls(
             status=data.get("status", "pending"),
-            started_at=data.get("started_at"),
             completed_at=data.get("completed_at"),
         )
 

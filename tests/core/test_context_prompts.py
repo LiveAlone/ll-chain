@@ -22,7 +22,7 @@ def _make_task(instruction: str | None = None) -> Task:
     return Task(
         name="t",
         flow="review",
-        status="running",
+        status="pending",
         created_at="2026-01-01T00:00:00",
         instruction=instruction,
         stages={
@@ -58,7 +58,7 @@ class TestContextPrompts:
         assert prompts[0] == {"source": "schema", "content": "分析代码"}
 
     def test_non_entry_node_with_instruction(self, tmp_path: Path):
-        """非入口节点即使 task 有 instruction 也不注入"""
+        """非入口节点也注入 user instruction"""
         schema = _make_schema()
         task = _make_task(instruction="重点关注 auth 模块")
         config = Config()
@@ -66,8 +66,9 @@ class TestContextPrompts:
         result = build_stage_context(task, schema, config, "report", tmp_path)
 
         prompts = result["instruction"]["prompts"]
-        assert len(prompts) == 1
+        assert len(prompts) == 2
         assert prompts[0] == {"source": "schema", "content": "生成报告"}
+        assert prompts[1] == {"source": "user", "content": "重点关注 auth 模块"}
 
     def test_non_entry_node_without_instruction(self, tmp_path: Path):
         schema = _make_schema()

@@ -41,7 +41,7 @@ def build_stage_context(
 
     # instruction: prompts 列表
     prompts: list[dict] = [{"source": "schema", "content": node.prompt}]
-    if not node.depends_on and task.instruction:
+    if task.instruction:
         prompts.append({"source": "user", "content": task.instruction})
 
     return {

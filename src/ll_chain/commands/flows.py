@@ -1,8 +1,8 @@
 import click
 
 from ll_chain.constants import LLCHAIN_DIR
+from ll_chain.core.schema_resolver import load_all_schemas
 from ll_chain.models.config import Config
-from ll_chain.models.schema import Schema
 from ll_chain.utils.output import output_result
 
 
@@ -13,11 +13,8 @@ def flows_cmd(as_json: bool):
     if not LLCHAIN_DIR.exists():
         raise click.ClickException("尚未初始化，请先执行 ll-chain init")
 
-    schemas_dir = LLCHAIN_DIR / "schemas"
-    flows = []
-    for path in sorted(schemas_dir.glob("*.yaml")):
-        schema = Schema.load(path)
-        flows.append({"id": schema.id, "description": schema.description})
+    schemas = load_all_schemas()
+    flows = [{"id": s.id, "description": s.description} for s in schemas.values()]
 
     config = Config.load(LLCHAIN_DIR / "config.yaml")
 

@@ -2,6 +2,7 @@ import click
 
 from ll_chain.constants import LLCHAIN_DIR
 from ll_chain.core.dag import validate_dag
+from ll_chain.core.schema_resolver import resolve_schema_path
 from ll_chain.models.schema import Schema
 from ll_chain.models.task import Task
 from ll_chain.utils.output import output_result
@@ -17,9 +18,7 @@ def create_cmd(task_name: str, flow: str, instruction: str | None, as_json: bool
     if not LLCHAIN_DIR.exists():
         raise click.ClickException("尚未初始化，请先执行 ll-chain init")
 
-    schema_path = LLCHAIN_DIR / "schemas" / f"{flow}.yaml"
-    if not schema_path.exists():
-        raise click.ClickException(f"Schema 不存在：{schema_path}")
+    schema_path = resolve_schema_path(flow)
 
     task_dir = LLCHAIN_DIR / task_name
     if task_dir.exists():

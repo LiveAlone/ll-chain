@@ -2,6 +2,7 @@ import click
 
 from ll_chain.constants import LLCHAIN_DIR
 from ll_chain.core.context import build_stage_context
+from ll_chain.core.schema_resolver import resolve_schema_path
 from ll_chain.models.config import Config
 from ll_chain.models.schema import Schema
 from ll_chain.models.task import Task
@@ -22,7 +23,7 @@ def stage_cmd(task_name: str, node_id: str, as_json: bool):
         raise click.ClickException(f"Task 不存在：{task_name}")
 
     task = Task.load(task_file)
-    schema = Schema.load(LLCHAIN_DIR / "schemas" / f"{task.flow}.yaml")
+    schema = Schema.load(resolve_schema_path(task.flow))
     config = Config.load(LLCHAIN_DIR / "config.yaml")
 
     try:

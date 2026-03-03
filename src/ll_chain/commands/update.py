@@ -7,7 +7,7 @@ from ll_chain.core.dag import derive_task_status
 from ll_chain.models.task import Task
 from ll_chain.utils.output import output_result
 
-VALID_STATUSES = ("pending", "running", "completed", "failed")
+VALID_STATUSES = ("pending", "completed", "failed")
 
 
 @click.command()
@@ -40,10 +40,10 @@ def update_cmd(task_name: str, node_id: str, status: str, as_json: bool):
     now = datetime.now().isoformat(timespec="seconds")
 
     stage.status = status
-    if status == "running":
-        stage.started_at = now
-    elif status in ("completed", "failed"):
+    if status in ("completed", "failed"):
         stage.completed_at = now
+    elif status == "pending":
+        stage.completed_at = None
 
     task.status = derive_task_status(task.stages)
     task.save(task_file)
