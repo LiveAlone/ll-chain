@@ -21,6 +21,7 @@ uv run pytest                    # 运行全部测试
 uv run pytest tests/core/test_dag.py::TestValidateDag::test_valid_dag  # 单个测试
 make install                     # 全局安装（uv tool install --editable）
 make uninstall                   # 全局卸载
+make clean                       # 清理构建产物和缓存
 ```
 
 ## Architecture
@@ -50,7 +51,9 @@ make uninstall                   # 全局卸载
 ### 关键模式
 
 - **所有命令支持 `--json` flag**，默认输出 YAML，加 `--json` 输出 JSON
-- **命令统一结构**：检查 `LLCHAIN_DIR` 存在 → 加载 models → 执行逻辑 → `output_result(data, as_json)`
+- **命令统一结构**：检查 `LLCHAIN_DIR` 存在 → 加载 models → 执行逻辑 → `output_result(data, as_json)`（`init` 命令例外，它负责创建 `.llchain/`）
+- **`LLCHAIN_DIR`**：定义在 `constants.py`，所有命令统一从此导入
+- **命令文件命名**：Python 保留字使用 `_cmd` 后缀（`init_cmd.py`, `list_cmd.py`），非保留字直接用原名
 - **Models 使用 dataclass**，不用 pydantic，手动实现 `load()`/`save()`/`to_dict()`
 - **DAG 逻辑集中在 `core/dag.py`**：拓扑排序检测环、计算 ready stages、推导 task 状态
 - **两层 Context 模型**（`core/context.py`）：Layer 1 = 全局 constraints，Layer 2 = 上游节点的 summary.md 路径。`instruction` 字段为 `prompts` 列表结构（`[{source, content}]`），入口节点可包含 user instruction。用户通过 `/ll-run` 手动驱动每一轮 DAG 执行
