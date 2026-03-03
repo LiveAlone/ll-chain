@@ -8,7 +8,7 @@ from ll_chain.templates import get_template_path
 from ll_chain.utils.output import output_result
 from ll_chain.utils.yaml_io import save_yaml
 
-SKILL_FILES = ["ll-run.md", "ll-create.md"]
+SKILL_FILES = ["ll-run.md", "ll-create.md", "ll-ff.md"]
 SCHEMA_FILES = ["code-review.yaml"]
 
 
